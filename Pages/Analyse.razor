@@ -1,0 +1,125 @@
+@page "/analyse"
+
+@using WebLogAnalyser.Services
+@using WebLogAnalyser.Models
+@inject DialogService DialogService
+@inject LogAnalyseService LogAnalyseService
+@implements IDisposable
+
+
+<div class="row" id="header">
+    <div class="col">
+        <RadzenUpload Accept="log/*.log" Url="upload/single" Progress="@((args) => OnProgress(args, "Single file upload"))" Complete=@OnComplete />
+    </div>
+    <div class="col">
+        <RadzenProgressBar Value="@progress" Unit="@info" Visible="@(progress>0)" Style="margin-bottom:20px;" />
+    </div>
+    <div class="col">
+        <RadzenButton Click="OnAnalyse" Text="Anaylise" Style="margin-bottom: 20px; width: 150px" />
+    </div> 
+</div>
+
+<div class="row" id="body">
+    <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true"
+                    Data="@logEntries" TItem="LogEntry" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"
+                    SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEntries RowDoubleClick="DoubleClickCallBack"
+                    RowRender="@RowRender" Style="height: 800px">
+        <Columns>
+            <RadzenDataGridColumn TItem="LogEntry" Property="Date" Filterable="false" Title="Date" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+            <RadzenDataGridColumn TItem="LogEntry" Property="Type" Title="Type" Width="25px" />
+            <RadzenDataGridColumn TItem="LogEntry" Property="Payload" Title="Payload" />
+        </Columns>
+    </RadzenDataGrid>
+</div>
+
+
+@code
+{ private IEnumerable<LogEntry> logEntries;
+    IList<LogEntry> selectedEntries;
+    int progress;
+    string info;
+
+    public void Dispose()
+    {
+        // The DialogService is a singleton so it is advisable to unsubscribe.
+        //DialogService.OnOpen -= Open;
+        //DialogService.OnClose -= Close;
+    }
+
+    void OnProgress(UploadProgressArgs args, string name)
+    {
+        this.info = $"% '{name}' / {args.Loaded} of {args.Total} bytes.";
+        this.progress = args.Progress;
+    }
+
+    async Task OnComplete(UploadCompleteEventArgs args)
+    {
+        _ = ShowBusyDialog();
+        logEntries = await LogAnalyseService.GetLogLinesAsync();
+        // Close the dialog
+        DialogService.Close();
+    }
+
+    private async Task DoubleClickCallBack(DataGridRowMouseEventArgs<LogEntry> args)
+    {
+        var data = new List<LogEntry>();
+        data.Add(args.Data);
+        await OpenEfbValueDialog(data);
+    }
+
+    private async Task OnAnalyse()
+    {
+        await OpenEfbValueDialog(selectedEntries);
+    }
+
+    public async Task OpenEfbValueDialog(IEnumerable<LogEntry> selectedEntries)
+    {
+        await DialogService.OpenAsync<DialogLineChartPage>($"SelectedEntries {selectedEntries.Count()}",
+            new Dictionary<string, object>() { { "SelectedEntries", selectedEntries } },
+            new DialogOptions() { Width = "1200px", Height = "600px", Resizable = true, Draggable = true });
+    }
+
+    async Task ShowBusyDialog()
+    {
+        await BusyDialog("Parsing File ...");
+    }
+
+    // Busy dialog from string
+    async Task BusyDialog(string message)
+    {
+        await DialogService.OpenAsync("", ds =>
+        {
+            RenderFragment content = b =>
+            {
+                b.OpenElement(0, "div");
+                b.AddAttribute(1, "class", "row");
+
+                b.OpenElement(2, "div");
+                b.AddAttribute(3, "class", "col-md-12");
+
+                b.AddContent(4, message);
+
+                b.CloseElement();
+                b.CloseElement();
+            };
+            return content;
+        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto" });
+    }
+
+    void RowRender(RowRenderEventArgs<LogEntry> args)
+    {
+
+        switch (args.Data.Type)
+        {
+
+            case "E":
+                args.Attributes.Add("style", $"background-color: red;");
+                break;
+
+            default:
+
+                break;
+
+        }
+    }
+}

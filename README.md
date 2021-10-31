@@ -1,0 +1,1 @@
+WebLogAnalyser as Blazor Playground
