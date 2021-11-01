@@ -13,9 +13,9 @@ namespace WebLogAnalyser.Services
         {
             _repository = repository;
         }
-        public Task<IEnumerable<LogEntry>> GetLogLinesAsync()
+        public Task<LogFile> GetLogFileInfoAsync()
         {
-            return Task.FromResult(_repository.GetLogEntries());
+            return Task.FromResult(_repository.GetLogFileInformation());
         }
     }
 }

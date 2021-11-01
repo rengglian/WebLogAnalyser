@@ -3,7 +3,7 @@
 @using WebLogAnalyser.Models
 @inject Radzen.DialogService dialogService
 
-<h1>@Title</h1>
+First entry: @Title
 <div class="container">
     <div class="row">
         <div class="col">
@@ -58,6 +58,7 @@
 
     protected override void OnInitialized()
     {
+        Title = $"{SelectedEntries.First().Date}";
         foreach(var entry in SelectedEntries)
         {
             var values = new List<PointItem>();

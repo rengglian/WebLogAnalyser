@@ -6,7 +6,7 @@ namespace WebLogAnalyser.Interfaces
 {
     public interface ILogRepository
     {
-        IEnumerable<LogEntry> GetLogEntries();
-        void SetLoglines(IEnumerable<string> loglines);
+        LogFile GetLogFileInformation();
+        void SetLoglines(string filename, IEnumerable<string> loglines);
     }
 }

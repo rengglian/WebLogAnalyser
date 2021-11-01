@@ -57,7 +57,7 @@ namespace WebLogAnalyser.Controllers
                 }
                 _logger.LogInformation($"UploadFile First: {file.FileName}");
                 _logLines = ReadLogLines(file);
-                _repository.SetLoglines(_logLines);
+                _repository.SetLoglines(file.FileName, _logLines);
                 _logger.LogInformation($"UploadFile Second: {file.FileName}");
                 var fullPath = Path.Combine(uploadPath, file.FileName);
                 using FileStream fileStream = new(fullPath, FileMode.Create, FileAccess.Write);

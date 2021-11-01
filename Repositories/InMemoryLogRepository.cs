@@ -6,11 +6,11 @@ namespace WebLogAnalyser.Repositories
 {
     public class InMemoryLogRepository : ILogRepository
     {
-        private List<LogEntry> _logEntries;
+        private LogFile _logFile;
 
-        public void SetLoglines(IEnumerable<string> loglines)
+        public void SetLoglines(string filename, IEnumerable<string> loglines)
         {
-            _logEntries = new List<LogEntry>();
+            var logEntries = new List<LogEntry>();
             foreach (var logline in loglines)
             {
                 string[] splits = logline.Split("\t");
@@ -20,13 +20,16 @@ namespace WebLogAnalyser.Repositories
                     Type = splits[1],
                     Payload = string.Join("\t", splits, 2, splits.Length - 2)
                 };
-                _logEntries.Add(entry);
+                logEntries.Add(entry);
             }
+            _logFile = new();
+            _logFile.LogEntries = logEntries;
+            _logFile.FileName = filename;
         }
 
-        public IEnumerable<LogEntry> GetLogEntries()
+        public LogFile GetLogFileInformation()
         {
-            return _logEntries;
+            return _logFile;
         }
     }
 }

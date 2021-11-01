@@ -21,7 +21,7 @@
 
 <div class="row" id="body">
     <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true"
-                    Data="@logEntries" TItem="LogEntry" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"
+                    Data="@logFile?.LogEntries" TItem="LogEntry" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or"
                     SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEntries RowDoubleClick="DoubleClickCallBack"
                     RowRender="@RowRender" Style="height: 800px">
         <Columns>
@@ -34,7 +34,8 @@
 
 
 @code
-{ private IEnumerable<LogEntry> logEntries;
+{ 
+    private LogFile logFile;
     IList<LogEntry> selectedEntries;
     int progress;
     string info;
@@ -55,7 +56,7 @@
     async Task OnComplete(UploadCompleteEventArgs args)
     {
         _ = ShowBusyDialog();
-        logEntries = await LogAnalyseService.GetLogLinesAsync();
+        logFile = await LogAnalyseService.GetLogFileInfoAsync();
         // Close the dialog
         DialogService.Close();
     }
@@ -74,7 +75,7 @@
 
     public async Task OpenEfbValueDialog(IEnumerable<LogEntry> selectedEntries)
     {
-        await DialogService.OpenAsync<DialogLineChartPage>($"SelectedEntries {selectedEntries.Count()}",
+        await DialogService.OpenAsync<DialogLineChartPage>($"{logFile.FileName}",
             new Dictionary<string, object>() { { "SelectedEntries", selectedEntries } },
             new DialogOptions() { Width = "1200px", Height = "600px", Resizable = true, Draggable = true });
     }
