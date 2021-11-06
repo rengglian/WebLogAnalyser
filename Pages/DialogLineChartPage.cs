@@ -17,8 +17,7 @@ namespace WebLogAnalyser.Pages
 
         string Title = "Line Chart";     
         int MaxX = 0;
-
-        List<LineChartItem> lineCharts = new List<LineChartItem>();
+        readonly List<LineChartItem> lineCharts = new();
         bool showLegend = false;
 
         protected override void OnInitialized()

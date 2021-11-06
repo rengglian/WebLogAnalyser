@@ -15,10 +15,10 @@ namespace WebLogAnalyser.Pages
         [Inject]
         public virtual LogAnalyseService LogAnalyseService { get; set; }
 
-        private LogFile logFile;
-        IList<LogEntry> selectedEntries;
-        int progress;
-        string info;
+        private LogFile logFile;        IList<LogEntry> selectedEntries;
+        private int progress;
+        private string info;
+        private bool DisableAnaylse => !(selectedEntries?.Count > 0);
 
         public void Dispose()
         {

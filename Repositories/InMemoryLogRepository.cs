@@ -24,13 +24,10 @@ namespace WebLogAnalyser.Repositories
                         Date = splits[0],
                         Type = splits[1],
                         Payload = string.Join("\t", splits, 2, splits.Length - 2)
+
                     };
                     logEntries.Add(entry);
                 }
-
-                var result = logEntries.Select((x, i) => new { x, i })
-                  .Where(x => x.x.Payload.Contains("Enter energy calibration [Run"))
-                  .Select(x => x.i).ToList();
 
                 _logFile = new();
                 _logFile.LogEntries = logEntries;
