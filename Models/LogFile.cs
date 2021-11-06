@@ -6,5 +6,6 @@ namespace WebLogAnalyser.Models
     {
         public string FileName { get; set; }
         public IEnumerable<LogEntry> LogEntries { get; set; }
+        public IEnumerable<IEnumerable<LogEntry>> Runs { get; set; }
 }
 }

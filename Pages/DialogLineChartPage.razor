@@ -1,8 +1,5 @@
 ﻿@page "/dialogLinechartpage/1"
 
-@using WebLogAnalyser.Models
-@inject Radzen.DialogService dialogService
-
 First entry: @Title
 <div class="container">
     <div class="row">
@@ -29,58 +26,7 @@ First entry: @Title
 
 <div class="row">
     <div class="col-md-12">
-        <RadzenButton Click="@((args) => dialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
-        <RadzenButton Click="@((args) => dialogService.Close(false))" ButtonStyle="ButtonStyle.Secondary" Text="Cancel" Style="margin-bottom: 10px; width: 150px" />
+        <RadzenButton Click="@((args) => DialogService.Close(true))" Text="OK" Style="margin-bottom: 10px; width: 150px" />
+        <RadzenButton Click="@((args) => DialogService.Close(false))" ButtonStyle="ButtonStyle.Secondary" Text="Cancel" Style="margin-bottom: 10px; width: 150px" />
     </div>
 </div>
-
-@code {
-    [Parameter] public IEnumerable<LogEntry> SelectedEntries { get; set; }
-
-    string Title = "Line Chart";
-
-    class PointItem
-    {
-        public int Y { get; set; } = 0;
-        public int X { get; set; } = 0;
-    }
-
-    class LineChartItem
-    {
-        public string Title { get; set; }
-        public List<PointItem> Values { get; set; }
-    }
-
-    int MaxX = 0;
-
-    List<LineChartItem> lineCharts = new List<LineChartItem>();
-    bool showLegend = false;
-
-    protected override void OnInitialized()
-    {
-        Title = $"{SelectedEntries.First().Date}";
-        foreach(var entry in SelectedEntries)
-        {
-            var values = new List<PointItem>();
-            string[] splits = entry.Payload.Split("\t");
-            int i = 0;
-            if (splits.Length > 1)
-            {
-                foreach (var strValue in splits)
-                {
-                    if (Int32.TryParse(strValue, out int val))
-                    {
-                        values.Add(new PointItem { Y = val, X = i });
-                        i++;
-                        if (i > MaxX) MaxX = i;
-                    }
-                }
-            }
-            else
-            {
-                values.Add(new PointItem { Y = 0, X = i });
-            }
-            lineCharts.Add(new LineChartItem { Title = splits[0], Values = values });
-        }
-    }
-}
